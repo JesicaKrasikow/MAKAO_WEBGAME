@@ -26,7 +26,7 @@ class Game():
         self.card_stack.append(PlayingCard.draw_card(self.current_deck))
 
         # Id of the current player changes after every move
-        self.current_player_id = self.players_number - 1
+        self.current_player_id = 0
         self.current_player = self.players_list[self.current_player_id]
 
         # Check if beggining card is functional, if so - change it
@@ -314,9 +314,11 @@ class Game():
                         return Result.GAME_OVER
 
                 if self.game_status.request_suit == "" and self.card_stack[-1].rank == Rank.ACE:
-                    Rules.change_suit(self.current_player, self.game_status)
+                    return Result.CHANGE_SUIT
+                    # Rules.change_suit(self.current_player, self.game_status)
                 elif self.card_stack[-1].rank == Rank.JACK and self.game_status.last_given_jack != self.card_stack[-1]:
-                    Rules.change_rank(self.current_player, self.game_status, self.players_number, self.card_stack)
+                    return Result.CHANGE_RANK
+                    # Rules.change_rank(self.current_player, self.game_status, self.players_number, self.card_stack)
 
 
             return Result.OK

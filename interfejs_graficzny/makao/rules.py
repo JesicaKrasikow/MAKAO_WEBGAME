@@ -20,12 +20,14 @@ class GameState:
 
 
 class Result(IntFlag):
-    OK = 2
+    INIT = 0
     NO_CARD = 1
+    OK = 2
     WRONG_CARD = 3
     REQUEST_FOUR = 4
-    INIT = 0
     GAME_OVER = 5
+    CHANGE_SUIT = 6
+    CHANGE_RANK = 7
 
 
 class Rules:

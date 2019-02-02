@@ -53,14 +53,28 @@ def game():
     #     game = pickle.load(handle)
     global game, result
     nocardmessage = 0
-    if result != Result.WRONG_CARD:
+
+    if result != Result.INIT and (result == Result.OK or result == Result.NO_CARD):
         game.next_player()
-    else:
-        flash("Wybrałeś złą kartę. Spróbuj jeszcze raz.")
+
     turn = game.turn
     card_on_stack = game.card_stack[-1].show_stack_card()
     current_player = game.current_player
     current_player_cards = game.current_player.f_img_names()
+
+    if result == Result.CHANGE_RANK:
+        nocardmessage = 2
+        return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards,
+                               card_on_stack=card_on_stack, current_player=current_player, turn=turn)
+
+    elif result == Result.CHANGE_SUIT:
+        nocardmessage = 3
+        return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards,
+                               card_on_stack=card_on_stack, current_player=current_player, turn=turn)
+
+    if result == Result.WRONG_CARD:
+        flash("Wybrałeś złą kartę. Spróbuj jeszcze raz.")
+
     print("gra teraz gracz numer %d" % current_player.id)
     game.proper_cards = game.check_player_cards()
 
@@ -75,6 +89,7 @@ def game():
         flash("Gracze starają się siebie zablokować!")
 
     if len(game.proper_cards) == 0:
+        result = Result.NO_CARD
         nocardmessage = 1
 
     return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards, card_on_stack=card_on_stack, current_player=current_player, turn=turn)
