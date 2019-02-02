@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    {% with flash_messages = get_flashed_messages() %}
+        {% if flash_messages %}
+            <ul class=flashes>
+                {% for flash_message in flash_messages %}
+                    <li>{{ flash_message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <div style="text-align: left;">
+        <h3> Obecna tura: {{ turn }}</h3>
+        <h3> Player: {{ current_player.id }}</h3>
+    </div>
+
+    <br>
+
+    <div style="text-align: center;">
+        <h3>Karta na stosie:</h3>
+        <img src="/static/images/{{ card_on_stack }}.png" style="width:100px; height:150px;">
+    </div>
+
+    <br>
+
+    <div style="text-align: center;">
+        {% if nocardmessage == 1 %}
+
+            <form action = "{{ url_for('nocard') }}" method = "POST">
+
+                <!-- Trigger the modal with a button -->
+                    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">
+                        Nie masz ani jednej odpowiedniej karty! :(
+                    </button>
+
+                    <!-- Modal -->
+                        <div id="myModal" class="modal fade" role="dialog">
+                          <div class="modal-dialog">
+
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h4 class="modal-title">Uwaga!</h4>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                              </div>
+                              <div class="modal-body">
+                                <p>Musisz dobrać karty z talii. Omija Cię kolejka. </p>
+                              </div>
+                              <div class="modal-footer">
+                                  <input type="submit" name="nocard" value="OK" id="nocard" class="hide-input">
+                {#                  <label type="button" for="understood" class="btn btn-default" data-dismiss="modal" id="understood"></label>#}
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+            </form>
+
+        {% else %}
+
+            <div style="text-align: center;">
+                <h3>Twoje karty:</h3>
+            </div>
+
+            <form action = "{{ url_for('move') }}" method = "post">
+              <radiogroup>
+                <div >
+                {% set count = 0 %}
+                   {% for card in current_player_cards %}
+
+                      <input type="checkbox" name="card" value="{{ loop.index-1 }}" id="{{ card }}"  class="hide-input">
+                      <label for="{{ card }}">
+                          <img src="/static/images/{{ card }}.png" style="width:100px; height:150px;">
+                      </label>
+                       {% set count = count + 1 %}
+                  {% endfor %}
+                </div>
+              </radiogroup>
+                <div>
+                    <input type="submit" name="move" value="OK" id="chosen_card" class="hide-input">
+                      <label for="OK" class="button red-border is-outlined" id="chosen_card"></label>
+                </div>
+            </form>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}
