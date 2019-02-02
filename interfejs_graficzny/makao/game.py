@@ -7,7 +7,7 @@ class Game():
     def __init__(self):
 
         # How many players
-        self.players_number = 3
+        self.players_number = 2
 
         # Create full deck of shuffled cards
         self.current_deck = PlayingCard.create_deck()
@@ -122,12 +122,12 @@ class Game():
             for card in self.current_player.deck:
                 if card.rank.value == stack_card.rank.value or card.suit.value == stack_card.suit.value:
                     proper_cards.append(card)
-                    print("Dodałem kartę do proper_cards")
 
             if len(proper_cards) == 0:
                 Rules.take_cards(self.current_deck, self.card_stack, self.current_player, 1)
                 print("Musisz dobrać kartę")
 
+        print("Wypisuję proper_cards:")
         print(proper_cards)
         return proper_cards
 
@@ -270,7 +270,7 @@ class Game():
     def begin_turn(self, chosen_cards):
         print("BEGIN TURN\n")
         if self.game_over == False:
-            print(self.card_stack[-1])
+            print("Karta na stacku: %s" % (self.card_stack[-1]))
 
             if self.current_player_id == 0:
                 print('#########################################################')

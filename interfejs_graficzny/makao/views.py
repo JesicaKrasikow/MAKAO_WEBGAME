@@ -42,10 +42,26 @@ def move():
 
 @app.route('/game/nocard', methods=['POST'])
 def nocard():
-    global game
+    global game, result
+    result = Result.OK
     understood = request.form['nocard']
     if understood == "OK":
         return redirect(url_for('game'))
+
+@app.route('/game/changesuit', methods=['POST'])
+def changesuit():
+    global game, result
+    new_suit = request.form['new_suit']
+    if new_suit == "":
+        flash("Wybierz kolor karty, który masz w swojej talii!")
+        return redirect(url_for('game'))
+
+    if Rules.change_suit(game.current_player, game.game_status, new_suit) == False:
+        flash("Wybierz kolor karty, który masz w swojej talii!")
+    else:
+        result = Result.OK
+
+    return redirect(url_for('game'))
 
 @app.route('/game')
 def game():
@@ -53,14 +69,17 @@ def game():
     #     game = pickle.load(handle)
     global game, result
     nocardmessage = 0
-
-    if result != Result.INIT and (result == Result.OK or result == Result.NO_CARD):
+    print("Result: %s" % (result))
+    if result != Result.INIT and (result == Result.OK or result == Result.NO_CARD or result == Result.REQUEST_FOUR):
+        print("zmiana gracza")
         game.next_player()
 
     turn = game.turn
     card_on_stack = game.card_stack[-1].show_stack_card()
     current_player = game.current_player
     current_player_cards = game.current_player.f_img_names()
+    print("Wypisuję karty gracza:")
+    print(current_player_cards)
 
     if result == Result.CHANGE_RANK:
         nocardmessage = 2
@@ -81,12 +100,26 @@ def game():
     # check if there is any request to inform player
     if game.game_status.request_rank != 0:
         flash("Zażądano konkretnej wartości karty: %d!" % game.game_status.request_rank)
+        print("Zażądano konkretnej wartości karty: %d!" % game.game_status.request_rank)
     elif game.game_status.request_suit != "":
-        flash("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+        if game.game_status.request_suit == "C":
+            flash("Zażądano konkretnego koloru karty: TREFL!")
+            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+        if game.game_status.request_suit == "D":
+            flash("Zażądano konkretnego koloru karty: KARO!")
+            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+        if game.game_status.request_suit == "H":
+            flash("Zażądano konkretnego koloru karty: KIER!")
+            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+        if game.game_status.request_suit == "S":
+            flash("Zażądano konkretnego koloru karty: PIK!")
+            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
     elif game.game_status.war_counter != 0:
         flash("Toczy się wojna!")
+        print("Toczy się wojna!")
     elif game.game_status.stop_turn_counter != 0:
         flash("Gracze starają się siebie zablokować!")
+        print("Gracze starają się siebie zablokować!")
 
     if len(game.proper_cards) == 0:
         result = Result.NO_CARD
@@ -94,16 +127,7 @@ def game():
 
     return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards, card_on_stack=card_on_stack, current_player=current_player, turn=turn)
 
-# @app.route('/game/nocard')
-# def nocard():
-#     flash("Nie masz karty, musisz dobrać ze stosu.")
-#
-#     ok = request.form['OK']
-#     if ok == 1:
-#         return redirect(url_for('game'))
-#     # time.sleep(5)
-#     return redirect(url_for('nocard'))
-#     # return render_template('nocard.html')
+
 
 
 

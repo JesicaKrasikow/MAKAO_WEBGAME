@@ -3,13 +3,15 @@
 {% block body %}
 
     {% with flash_messages = get_flashed_messages() %}
-        {% if flash_messages %}
-            <ul class=flashes>
-                {% for flash_message in flash_messages %}
-                    <li>{{ flash_message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+            {% if flash_messages %}
+                <div class="alert alert-warning">
+                    <ul style="list-style:none" class=flashes>
+                        {% for flash_message in flash_messages %}
+                            <li>{{ flash_message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
     {% endwith %}
 
     <div style="text-align: left;">
@@ -57,6 +59,35 @@
 
                           </div>
                         </div>
+            </form>
+
+            {% elif nocardmessage == 3 %}
+
+
+                <div style="text-align: center;">
+                    <h6> Wybierz nowy suit: </h6>
+                </div>
+
+                <form action = "{{ url_for('changesuit') }}" method = "POST">
+                  <radiogroup>
+                    <div >
+                          <input type="radio" name="new_suit" value="S" id="S"  class="hide-input">
+                          <label for="new_suit">PIK</label>
+                          <input type="radio" name="new_suit" value="H" id="H"  class="hide-input">
+                          <label for="new_suit">KIER</label>
+                          <input type="radio" name="new_suit" value="C" id="C"  class="hide-input">
+                          <label for="new_suit">TREFL</label>
+                          <input type="radio" name="new_suit" value="D" id="D"  class="hide-input">
+                          <label for="new_suit">KARO</label>
+                    </div>
+                  </radiogroup>
+                    <br>
+                    <div>
+                        <input type="submit" name="new_suit" value="OK" id="new_suit" class="hide-input">
+                          <label for="OK" class="button red-border is-outlined" id="new_suit"></label>
+                    </div>
+                </form>
+
             </form>
 
         {% else %}

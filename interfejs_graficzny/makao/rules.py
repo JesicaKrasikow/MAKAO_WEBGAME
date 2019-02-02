@@ -31,7 +31,6 @@ class Result(IntFlag):
 
 
 class Rules:
-
     # If player does not have enough cards, they have to take new card from deck
     @staticmethod
     def take_cards(deck, stack, player, num_cards):
@@ -98,27 +97,26 @@ class Rules:
 
     # If player chooses to play ACE, they can change the suit
     @staticmethod
-    def change_suit(player, status):
+    def change_suit(player, status, new_suit):
         print("change suit")
 
         suits = ['S', 'C', 'H', 'D']
-        print('Wybierz nowy suit: S, C, H, D')
-        new_suit = str(input())
+        print("To jest nowy suit:")
         print(new_suit)
         players_card_suits = []
 
         for card in player.deck:
             players_card_suits.append(card.suit.value)
 
-        while True:
-            if new_suit in players_card_suits:
-                print("Kolejny gracz musi dać kartę z suit: %s." % (new_suit))
-                status.request_suit = new_suit
-                return
-            else:
-                print('Wybierz kolor, który masz!')
-                print('Wybierz nowy suit: S, C, H, D')
-                new_suit = str(input())
+        if new_suit in players_card_suits:
+            print("Kolejny gracz musi dać kartę z suit: %s." % (new_suit))
+            status.request_suit = new_suit
+            return True
+        else:
+            print('Wybierz kolor, który masz!')
+            print('Wybierz nowy suit: S, C, H, D')
+            return False
+
 
     # If there is a requested suit from the other player's ACE
     @staticmethod
