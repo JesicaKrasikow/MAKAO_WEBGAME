@@ -161,7 +161,7 @@ class Rules:
                 print('Zła karta!')
 
     @staticmethod
-    def change_rank(player, status, number_of_players, stack):
+    def change_rank(player, status, number_of_players, stack, new_rank):
 
         status.last_given_jack = stack[-1] #It remembers the last given card (JACK) to see when the new JACK requests comes to game
         print("change rank")
@@ -174,22 +174,25 @@ class Rules:
             players_card_ranks.append(card.rank.value)
 
         if [i for i in players_card_ranks if i in ranks]:
-            print('Wybierz nowy rank: 5, 6, 7, 8, 9, 10')
-            new_rank = int(input())
+            # print('Wybierz nowy rank: 5, 6, 7, 8, 9, 10')
+            # new_rank = int(input())
+            # print(new_rank)
+            print("Wybrany rank:")
             print(new_rank)
-            while True:
-                if new_rank in players_card_ranks:
-                    print("Kolejny gracz musi dać kartę z rank: %d." % (new_rank))
-                    status.request_rank = new_rank
-                    status.request_counter = number_of_players
-                    return
-                else:
-                    print('Wybierz kartę, którą masz!')
-                    print('Wybierz nowy rank: 5, 6, 7, 8, 9, 10')
-                    new_rank = int(input())
+            print(type(new_rank))
+            if new_rank in players_card_ranks:
+                print("Kolejny gracz musi dać kartę z rank: %d." % (new_rank))
+                status.request_rank = new_rank
+                status.request_counter = number_of_players
+                return True
+            else:
+                print('Wybierz kartę, którą masz!')
+                print('Wybierz nowy rank: 5, 6, 7, 8, 9, 10')
+                return False
+                # new_rank = int(input())
         else:
             print('Nie możesz żądać żadnej karty, bo nie masz kart niefunkcyjnych.')
-            return
+            return True
 
     # If there is requested rank from the others player's JACK
     @staticmethod

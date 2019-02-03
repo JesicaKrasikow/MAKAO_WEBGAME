@@ -48,6 +48,14 @@ def nocard():
     if understood == "OK":
         return redirect(url_for('game'))
 
+@app.route('/game/stopturn', methods=['POST'])
+def stopturn():
+    global game, result
+    result = Result.OK
+    understood = request.form['stopturn']
+    if understood == "OK":
+        return redirect(url_for('game'))
+
 @app.route('/game/changesuit', methods=['POST'])
 def changesuit():
     global game, result
@@ -63,14 +71,30 @@ def changesuit():
 
     return redirect(url_for('game'))
 
+@app.route('/game/changerank', methods=['POST'])
+def changerank():
+    global game, result
+    new_rank = int(request.form['new_rank'])
+    if new_rank == 0:
+        flash("Wybierz figurę, którą masz w swojej talii!")
+        return redirect(url_for('game'))
+    if Rules.change_rank(game.current_player, game.game_status, game.players_number, game.card_stack, new_rank) == False:
+        flash("Wybierz figurę, którą masz w swojej talii!")
+    else:
+        result = Result.OK
+
+    return redirect(url_for('game'))
+
 @app.route('/game')
 def game():
-    # with open('write.pickle', 'rb') as handle:
-    #     game = pickle.load(handle)
     global game, result
     nocardmessage = 0
     print("Result: %s" % (result))
-    if result != Result.INIT and (result == Result.OK or result == Result.NO_CARD or result == Result.REQUEST_FOUR):
+
+    if result == Result.GAME_OVER:
+        return render_template('gameover.html',winners = game.winners_list)
+
+    if result != Result.INIT and (result == Result.OK or result == Result.NO_CARD):
         print("zmiana gracza")
         game.next_player()
 
@@ -80,6 +104,11 @@ def game():
     current_player_cards = game.current_player.f_img_names()
     print("Wypisuję karty gracza:")
     print(current_player_cards)
+
+    if game.if_player_stop_turn() == True:
+        nocardmessage = 4
+        return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards,
+                               card_on_stack=card_on_stack, current_player=current_player, turn=turn)
 
     if result == Result.CHANGE_RANK:
         nocardmessage = 2
@@ -103,17 +132,17 @@ def game():
         print("Zażądano konkretnej wartości karty: %d!" % game.game_status.request_rank)
     elif game.game_status.request_suit != "":
         if game.game_status.request_suit == "C":
-            flash("Zażądano konkretnego koloru karty: TREFL!")
-            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+            flash("Zmieniono kolor karty: TREFL!")
+            print("Zmieniono kolor karty: %s !" % game.game_status.request_suit)
         if game.game_status.request_suit == "D":
-            flash("Zażądano konkretnego koloru karty: KARO!")
-            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+            flash("Zmieniono kolor karty: KARO!")
+            print("Zmieniono kolor karty: %s !" % game.game_status.request_suit)
         if game.game_status.request_suit == "H":
-            flash("Zażądano konkretnego koloru karty: KIER!")
-            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+            flash("Zmieniono kolor karty: KIER!")
+            print("Zmieniono kolor karty: %s !" % game.game_status.request_suit)
         if game.game_status.request_suit == "S":
-            flash("Zażądano konkretnego koloru karty: PIK!")
-            print("Zażądano konkretnego koloru karty: %s !" % game.game_status.request_suit)
+            flash("Zmieniono kolor karty: PIK!")
+            print("Zmieniono kolor karty: %s !" % game.game_status.request_suit)
     elif game.game_status.war_counter != 0:
         flash("Toczy się wojna!")
         print("Toczy się wojna!")
@@ -125,7 +154,9 @@ def game():
         result = Result.NO_CARD
         nocardmessage = 1
 
-    return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards, card_on_stack=card_on_stack, current_player=current_player, turn=turn)
+
+    return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards,
+                           card_on_stack=card_on_stack, current_player=current_player, turn=turn)
 
 
 

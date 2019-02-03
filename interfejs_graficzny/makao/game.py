@@ -39,8 +39,8 @@ class Game():
 
         # Game starts on turn number 0
         self.turn = 0
-        # Game is on
-        self.game_over = False
+        # List of winners
+        self.winners_list = []
         # Variable which tells if there is any request from the card on the stack
         self.game_status = GameState(self.players_number)
 
@@ -266,62 +266,65 @@ class Game():
         self.current_player.remove_card(card)
         self.card_stack.append(card)
 
+
+    def if_player_stop_turn(self):
+
+        # Check if current player is able to play (stop_turn_players[id] > 0)
+        if self.game_status.stop_turn_players[self.current_player.id] > 0:
+            self.game_status.stop_turn_players[self.current_player.id] -= 1
+            return True
+
+        return False
+
     #Game is on!
     def begin_turn(self, chosen_cards):
         print("BEGIN TURN\n")
-        if self.game_over == False:
-            print("Karta na stacku: %s" % (self.card_stack[-1]))
 
-            if self.current_player_id == 0:
-                print('#########################################################')
-                print('Obecna tura: %d \n' % (self.turn))
+        print("Karta na stacku: %s" % (self.card_stack[-1]))
 
-            # Check if current player is able to play (stop_turn_players[id] > 0)
-            if self.game_status.stop_turn_players[self.current_player.id] > 0:
-                self.game_status.stop_turn_players[self.current_player.id] -= 1
-                return Result.REQUEST_FOUR
-
-            else:
-
-                found_proper_card = False
-
-                for card in chosen_cards:
-                    if self.if_card_is_proper(card, self.proper_cards) == True:
-                        chosen_cards.remove(card)
-                        found_proper_card = True
-                        break
-
-                if found_proper_card == False:
-                    print("Zła karta. Musisz wybrac jeszcze raz")
-                    return Result.WRONG_CARD
-
-                for card in chosen_cards:
-                    self.give_chosen_card(card)
-
-                PlayingCard.show_stack(self.card_stack[-1])
-
-                self.current_player.show_cards()
-                print(self.current_player.show_cards())
-
-                # Check if current_player has any cards
-                if len(self.current_player.deck) == 0:
-                    print("Wygrał gracz nr %d!" % (self.current_player_id))
-                    del self.players_list[self.current_player_id]
-                    # players_list.del(current_player_id)
-                    self.players_number -= 1
-                    if self.players_number <= 1:
-                        self.game_over = True
-                        return Result.GAME_OVER
-
-                if self.game_status.request_suit == "" and self.card_stack[-1].rank == Rank.ACE:
-                    return Result.CHANGE_SUIT
-                    # Rules.change_suit(self.current_player, self.game_status)
-                elif self.card_stack[-1].rank == Rank.JACK and self.game_status.last_given_jack != self.card_stack[-1]:
-                    return Result.CHANGE_RANK
-                    # Rules.change_rank(self.current_player, self.game_status, self.players_number, self.card_stack)
+        if self.current_player_id == 0:
+            print('#########################################################')
+            print('Obecna tura: %d \n' % (self.turn))
 
 
-            return Result.OK
+        found_proper_card = False
 
-        else:
-            print('Koniec gry!')
+        for card in chosen_cards:
+            if self.if_card_is_proper(card, self.proper_cards) == True:
+                chosen_cards.remove(card)
+                found_proper_card = True
+                break
+
+        if found_proper_card == False:
+            print("Zła karta. Musisz wybrac jeszcze raz")
+            return Result.WRONG_CARD
+
+        for card in chosen_cards:
+            self.give_chosen_card(card)
+
+        PlayingCard.show_stack(self.card_stack[-1])
+
+        self.current_player.show_cards()
+        print(self.current_player.show_cards())
+
+        # Check if current_player has any cards
+        if len(self.current_player.deck) == 0:
+            self.winners_list.append(self.current_player_id)
+            print("Wygrał gracz nr %d!" % (self.current_player_id))
+            del self.players_list[self.current_player_id]
+            # players_list.del(current_player_id)
+            self.players_number -= 1
+            if self.players_number <= 1:
+                self.winners_list.append(self.players_list[0])
+                return Result.GAME_OVER
+
+        if self.game_status.request_suit == "" and self.card_stack[-1].rank == Rank.ACE:
+            return Result.CHANGE_SUIT
+            # Rules.change_suit(self.current_player, self.game_status)
+        elif self.card_stack[-1].rank == Rank.JACK and self.game_status.last_given_jack != self.card_stack[-1]:
+            return Result.CHANGE_RANK
+            # Rules.change_rank(self.current_player, self.game_status, self.players_number, self.card_stack)
+
+
+        return Result.OK
+
