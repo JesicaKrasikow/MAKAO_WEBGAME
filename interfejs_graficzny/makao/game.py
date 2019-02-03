@@ -315,7 +315,7 @@ class Game():
             # players_list.del(current_player_id)
             self.players_number -= 1
             if self.players_number <= 1:
-                self.winners_list.append(self.players_list[0])
+                self.winners_list.append(self.players_list[0].id)
                 return Result.GAME_OVER
 
         if self.game_status.request_suit == "" and self.card_stack[-1].rank == Rank.ACE:

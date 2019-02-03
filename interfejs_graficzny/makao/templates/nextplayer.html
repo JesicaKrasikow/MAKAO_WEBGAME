@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<br>
+
+<div style="text-align: center; margin-top: 10%; margin-bottom: 10%;">
+    <h1> Następuje zmiana gracza!</h1>
+    <form action = "{{ url_for('nextplayer') }}" method = "POST">
+        <input type="submit" name="nextplayer" value="OK" id="nextplayer" class="hide-input">
+    </form>
+</div>
+
+{% endblock %}

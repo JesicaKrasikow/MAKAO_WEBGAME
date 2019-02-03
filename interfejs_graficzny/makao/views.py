@@ -7,11 +7,12 @@ from .objects import *
 from flask import redirect
 import time
 
-global game, result
+global game, result, show_next_player_page
 
 @app.route('/')
 def index():
-    global game, result
+    global game, result, show_next_player_page
+    show_next_player_page = True
     game = Game()
     result = Result.INIT
     return render_template('index.html')
@@ -39,6 +40,15 @@ def move():
         result = game.begin_turn(chosen_cards)
 
     return redirect(url_for('game'))
+
+@app.route('/game/nextplayer', methods=['POST'])
+def nextplayer():
+    global game, result, show_next_player_page
+    show_next_player_page = False
+    result = Result.OK
+    understood = request.form['nextplayer']
+    if understood == "OK":
+        return redirect(url_for('game'))
 
 @app.route('/game/nocard', methods=['POST'])
 def nocard():
@@ -87,7 +97,7 @@ def changerank():
 
 @app.route('/game')
 def game():
-    global game, result
+    global game, result, show_next_player_page
     nocardmessage = 0
     print("Result: %s" % (result))
 
@@ -96,7 +106,11 @@ def game():
 
     if result != Result.INIT and (result == Result.OK or result == Result.NO_CARD):
         print("zmiana gracza")
+        if show_next_player_page == True:
+            return render_template('nextplayer.html')
+
         game.next_player()
+        show_next_player_page = True
 
     turn = game.turn
     card_on_stack = game.card_stack[-1].show_stack_card()
