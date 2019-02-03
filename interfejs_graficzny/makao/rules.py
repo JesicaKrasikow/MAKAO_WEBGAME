@@ -161,6 +161,19 @@ class Rules:
                 print('Zła karta!')
 
     @staticmethod
+    def player_nonfunctional_cards(player):
+        ranks = [Rank.FIVE.value, Rank.SIX.value, Rank.SEVEN.value, Rank.EIGHT.value, Rank.NINE.value, Rank.TEN.value]
+        players_card_ranks = []
+
+        for card in player.deck:
+            players_card_ranks.append(card.rank.value)
+
+        for rank in players_card_ranks:
+            if rank in ranks:
+                return True
+        return False
+
+    @staticmethod
     def change_rank(player, status, number_of_players, stack, new_rank):
 
         status.last_given_jack = stack[-1] #It remembers the last given card (JACK) to see when the new JACK requests comes to game

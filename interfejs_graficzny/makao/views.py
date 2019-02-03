@@ -124,7 +124,7 @@ def game():
         return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards,
                                card_on_stack=card_on_stack, current_player=current_player, turn=turn)
 
-    if result == Result.CHANGE_RANK:
+    if result == Result.CHANGE_RANK and Rules.player_nonfunctional_cards(current_player) == True:
         nocardmessage = 2
         return render_template('game.html', nocardmessage=nocardmessage, current_player_cards=current_player_cards,
                                card_on_stack=card_on_stack, current_player=current_player, turn=turn)

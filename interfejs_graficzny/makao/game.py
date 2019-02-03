@@ -69,7 +69,7 @@ class Game():
             for card in self.current_player.deck:
                 if card.rank == self.game_status.request_rank:  # player has requested card (in the requested rank)
                     proper_cards.append(card)
-                elif card.suit.value == stack_card.suit.value:  # player has another jack
+                elif card.suit.value == stack_card.suit.value or stack_card.rank == Rank.JACK:  # player has another jack
                     if card.rank == Rank.JACK:
                         proper_cards.append(card)
 
